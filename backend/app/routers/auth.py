@@ -64,7 +64,7 @@ def _frontend_redirect(path: str, params: dict[str, str] | None = None) -> str:
 
 
 def _exchange_google_code(code: str, redirect_uri: str) -> dict:
-    if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+    if not settings.google_oauth_configured:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Google OAuth credentials are not configured",
@@ -199,7 +199,7 @@ async def google_authorize(
     redirect_to: str = Query(default="/meetings"),
     current_user: User = Depends(get_current_user),
 ) -> GoogleAuthorizeResponse:
-    if not settings.GOOGLE_CLIENT_ID:
+    if not settings.google_oauth_configured:
         return success_response(data={"authorization_url": ""}, message="GOOGLE_CLIENT_ID is not configured")
 
     normalized_redirect = redirect_to if redirect_to.startswith("/") and not redirect_to.startswith("//") else "/meetings"

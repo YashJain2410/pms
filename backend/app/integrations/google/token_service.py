@@ -30,7 +30,7 @@ class GoogleTokenService:
 
     @staticmethod
     async def get_google_access_token(refresh_token: str) -> tuple[str, datetime | None]:
-        if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+        if not settings.google_oauth_configured:
             raise GoogleTokenRefreshError("Google OAuth credentials are not configured", status_code=500)
 
         body = urlencode(

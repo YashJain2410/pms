@@ -49,6 +49,15 @@ class Settings(BaseSettings):
             self.JWT_SECRET_KEY = self.JWT_SECRET
         return self
 
+    @staticmethod
+    def _is_configured_secret(value: str) -> bool:
+        normalized = value.strip().strip('"').strip("'").lower()
+        return bool(normalized) and not normalized.startswith("your-")
+
+    @property
+    def google_oauth_configured(self) -> bool:
+        return self._is_configured_secret(self.GOOGLE_CLIENT_ID) and self._is_configured_secret(self.GOOGLE_CLIENT_SECRET)
+
 
 @lru_cache
 def get_settings() -> Settings:
