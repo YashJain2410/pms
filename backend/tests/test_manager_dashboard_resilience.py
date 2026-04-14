@@ -91,6 +91,7 @@ async def test_ensure_team_data_seeds_when_no_team_exists(monkeypatch):
     current_user = _manager()
 
     monkeypatch.setattr(ManagerService, "_repair_manager_relationships", AsyncMock(return_value=0))
+    monkeypatch.setattr(ManagerService, "_auto_seed_enabled", staticmethod(lambda: True))
     monkeypatch.setattr(ManagerService, "_team_count", AsyncMock(return_value=0))
     seed_mock = AsyncMock(return_value=10)
     monkeypatch.setattr(ManagerSeedService, "seed_manager_data", seed_mock)
@@ -106,9 +107,28 @@ async def test_ensure_team_data_commits_when_relationships_are_repaired(monkeypa
     current_user = _manager()
 
     monkeypatch.setattr(ManagerService, "_repair_manager_relationships", AsyncMock(return_value=2))
+    monkeypatch.setattr(ManagerService, "_auto_seed_enabled", staticmethod(lambda: True))
     monkeypatch.setattr(ManagerService, "_team_count", AsyncMock(return_value=0))
     monkeypatch.setattr(ManagerSeedService, "seed_manager_data", AsyncMock(return_value=10))
 
     await ManagerService._ensure_team_data(current_user, db)
 
     db.commit.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_ensure_team_data_skips_auto_seed_when_disabled(monkeypatch):
+    db = _StubSession([])
+    current_user = _manager()
+
+    monkeypatch.setattr(ManagerService, "_repair_manager_relationships", AsyncMock(return_value=0))
+    monkeypatch.setattr(ManagerService, "_auto_seed_enabled", staticmethod(lambda: False))
+    team_count_mock = AsyncMock(return_value=0)
+    monkeypatch.setattr(ManagerService, "_team_count", team_count_mock)
+    seed_mock = AsyncMock(return_value=10)
+    monkeypatch.setattr(ManagerSeedService, "seed_manager_data", seed_mock)
+
+    await ManagerService._ensure_team_data(current_user, db)
+
+    team_count_mock.assert_not_awaited()
+    seed_mock.assert_not_awaited()

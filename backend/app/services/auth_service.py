@@ -113,7 +113,6 @@ class AuthService:
                 name=inferred_name,
                 profile_picture=None,
                 role=UserRole.employee,
-                roles=[UserRole.employee.value],
                 organization_id=org.id,
                 domain=domain,
                 first_login=True,

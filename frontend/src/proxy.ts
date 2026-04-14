@@ -62,7 +62,7 @@ function isPathAllowedForRole(pathname: string, role: UserRole): boolean {
   return allowedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("pms_token")?.value;
   const { pathname } = request.nextUrl;
 

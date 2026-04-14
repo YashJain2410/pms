@@ -1,6 +1,5 @@
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -15,7 +14,6 @@ class User(Base, UUIDMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String, nullable=False)
     profile_picture: Mapped[str | None] = mapped_column(String, nullable=True)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"), nullable=False, default=UserRole.employee)
-    roles: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
     organization_id: Mapped[str] = mapped_column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False, index=True)
     manager_id: Mapped[str | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True)
     domain: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -33,3 +31,10 @@ class User(Base, UUIDMixin, TimestampMixin):
 
     organization = relationship("Organization", back_populates="users")
     manager = relationship("User", remote_side="User.id")
+
+    @property
+    def roles(self) -> list[str]:
+        roles = {self.role.value}
+        if self.role == UserRole.manager:
+            roles.add(UserRole.employee.value)
+        return sorted(roles)

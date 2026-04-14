@@ -162,19 +162,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       setUnreadCount(payload.unread_count);
     };
 
-    load().catch(() => null);
-    const timer = window.setInterval(() => {
+    const handleVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
         return;
       }
       load().catch(() => null);
-    }, 120000);
+    };
+
+    if (notificationsOpen || notifications.length === 0) {
+      load().catch(() => null);
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
-      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [user]);
+  }, [notifications.length, notificationsOpen, user]);
 
   useEffect(() => {
     if (!user) {

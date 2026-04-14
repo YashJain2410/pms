@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
 
     DATABASE_URL: str = "postgresql+asyncpg://postgres:shiv@localhost:5432/pms"
-    DB_POOL_SIZE: int = 20
-    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_SIZE: int = 5
+    DB_MAX_OVERFLOW: int = 2
+    ENABLE_MANAGER_AUTO_SEED: bool = False
 
     JWT_SECRET_KEY: str = "change-this-in-production"
     JWT_SECRET: str | None = None

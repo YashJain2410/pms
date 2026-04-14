@@ -111,6 +111,8 @@ export default function HomePage() {
 
                   const targetRoute = resolveDefaultRouteForRole(me.role);
                   router.replace(targetRoute);
+                } catch {
+                  // Request errors are already surfaced via the shared API interceptor.
                 } finally {
                   setLoading(false);
                 }

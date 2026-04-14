@@ -13,11 +13,16 @@ from app.models.meeting import Meeting
 from app.models.performance_review import PerformanceReview
 from app.models.rating import Rating
 from app.models.user import User
+from app.config import get_settings
 from app.services.manager_seed_service import ManagerSeedService
 
 
 class ManagerService:
     logger = logging.getLogger(__name__)
+
+    @staticmethod
+    def _auto_seed_enabled() -> bool:
+        return bool(get_settings().ENABLE_MANAGER_AUTO_SEED)
 
     @staticmethod
     async def _team_count(current_user: User, db: AsyncSession) -> int:
@@ -101,6 +106,9 @@ class ManagerService:
                 "Manager relationship repair executed",
                 extra={"manager_id": str(current_user.id), "repaired_records": repaired_count},
             )
+
+        if not ManagerService._auto_seed_enabled():
+            return
 
         team_count = await ManagerService._team_count(current_user, db)
         if team_count > 0:

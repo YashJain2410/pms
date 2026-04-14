@@ -117,7 +117,6 @@ class ManagerSeedService:
                 name=f"Team Member {idx + 1}",
                 profile_picture=None,
                 role=UserRole.employee,
-                roles=[UserRole.employee.value],
                 organization_id=current_user.organization_id,
                 manager_id=current_user.id,
                 department=current_user.department or "General",
